@@ -1,0 +1,50 @@
+{
+  "demo_id": "DEMO001",
+  "source_type": "de-identified MRI with reviewed manual mask",
+  "shape": [
+    320,
+    260,
+    42
+  ],
+  "spacing_mm": [
+    1.1875,
+    1.1875,
+    3.0000007152557373
+  ],
+  "mask_values": [
+    0,
+    1
+  ],
+  "mask_voxels": 14538,
+  "voxel_values_preserved": true,
+  "geometry_preserved": true,
+  "source_headers_copied": false,
+  "source_extensions_copied": false,
+  "original_identity_or_dates_in_manifests": false,
+  "files": {
+    "data/DEMO001/F.nii.gz": {
+      "bytes": 2772934,
+      "sha256": "fc297bac8820fb3f376a3f5526920aef36dc599ce602391cb4e53f0414df1864"
+    },
+    "data/DEMO001/In.nii.gz": {
+      "bytes": 2961226,
+      "sha256": "e88c5428237606a25c529cd64b2840d630ce2fa1d4fdf25a0ba28acbad84574f"
+    },
+    "data/DEMO001/Opp.nii.gz": {
+      "bytes": 2985787,
+      "sha256": "bff94e7d96d5898fcdaa017c81b0f81ef17382e08a40ab900037849199ec206a"
+    },
+    "data/DEMO001/pancreas_mask.nii.gz": {
+      "bytes": 19682,
+      "sha256": "276312cdd57b8bc2682e1af13da809ef9b0b5b9d25d393ef227cc5f0fbf33407"
+    },
+    "data/DEMO001/W.nii.gz": {
+      "bytes": 2654969,
+      "sha256": "1326300a2a0362cf21e29f4b90deed37ac770322c29465962863fcb83e0ef1f7"
+    },
+    "references/DEMO001/pancreas_mask.nii.gz": {
+      "bytes": 19682,
+      "sha256": "276312cdd57b8bc2682e1af13da809ef9b0b5b9d25d393ef227cc5f0fbf33407"
+    }
+  }
+}

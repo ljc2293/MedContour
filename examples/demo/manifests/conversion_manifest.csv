@@ -1,0 +1,5 @@
+﻿patient_id,normalized_family,target_role,nifti_relative_path,json_relative_path,nifti_bytes,json_bytes,status
+DEMO001,Dixon demo,w,DEMO001/W.nii.gz,DEMO001/W.json,2654969,70,converted
+DEMO001,Dixon demo,f,DEMO001/F.nii.gz,DEMO001/F.json,2772934,70,converted
+DEMO001,Dixon demo,in,DEMO001/In.nii.gz,DEMO001/In.json,2961226,71,converted
+DEMO001,Dixon demo,opp,DEMO001/Opp.nii.gz,DEMO001/Opp.json,2985787,72,converted

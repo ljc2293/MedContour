@@ -1,0 +1,25 @@
+# Optional integration: docker compose -f compose.yaml -f compose.codex.yaml up -d --build
+services:
+  codex-worker:
+    build: ./codex-worker
+    restart: unless-stopped
+    environment:
+      CODEX_WORKSPACE_ROOT: /workspace
+      CODEX_TASK_FILE_ROOT: /workspace/.medcontour-task-files
+      CODEX_MODEL: ${CODEX_MODEL:-}
+      CODEX_RUN_TIMEOUT_SECONDS: ${CODEX_RUN_TIMEOUT_SECONDS:-600}
+    volumes:
+      - .:/workspace
+      - task-files:/workspace/.medcontour-task-files:ro
+      - codex-state:/home/codex/.codex
+      - ./codex-worker/config.toml:/home/codex/.codex/config.toml:ro
+      - ./codex-worker/auth.json:/home/codex/.codex/auth.json
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+volumes:
+  codex-state:

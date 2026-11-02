@@ -1,0 +1,94 @@
+name: medcontour
+
+services:
+  db:
+    image: postgres:16-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: annotation
+      POSTGRES_USER: annotation
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run python scripts/init_env.py first}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U annotation -d annotation"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://annotation:${POSTGRES_PASSWORD}@db:5432/annotation
+      DATA_ROOT: /data
+      MANIFESTS_ROOT: /manifests
+      PANCREAS_PREDICTION_ROOT: /pancreas-predictions
+      ANNOTATION_ROOT: /annotations
+      PREVIEW_ROOT: /previews
+      TASK_FILE_ROOT: /task-files
+      INITIAL_ADMIN_EMAIL: ${INITIAL_ADMIN_EMAIL:-admin@example.com}
+      INITIAL_ADMIN_PASSWORD: ${INITIAL_ADMIN_PASSWORD:?Run python scripts/init_env.py first}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-["http://127.0.0.1:18080","http://localhost:18080"]}
+      AUTO_IMPORT_DATASET: "true"
+      CODEX_WORKER_URL: http://codex-worker:8090
+      CODEX_WORKER_TIMEOUT_SECONDS: "600"
+      CODEX_WORKSPACE_ROOT: /workspace
+      CODEX_TASK_FILE_ROOT: /workspace/.medcontour-task-files
+    volumes:
+      - ${DATA_ROOT:-./examples/demo/data}:/data:ro
+      - ${MANIFESTS_ROOT:-./examples/demo/manifests}:/manifests:ro
+      - ${PANCREAS_PREDICTION_ROOT:-./examples/demo/references}:/pancreas-predictions:ro
+      - annotations:/annotations
+      - previews:/previews
+      - task-files:/task-files
+      - backups:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then(r=>{if(!r.ok)process.exit(1)})"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    networks: [internal]
+
+  gateway:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT:-18080}:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    networks: [internal]
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  annotations:
+  previews:
+  task-files:
+  backups:
